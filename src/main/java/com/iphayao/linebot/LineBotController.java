@@ -6,6 +6,7 @@ import com.linecorp.bot.client.MessageContentResponse;
 import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
+import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.ImageMessageContent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.StickerMessageContent;
@@ -91,8 +92,18 @@ public class LineBotController {
 
     }
 
+    @EventMapping
+    public void handlePostbackEvent(PostbackEvent event) {
+        log.info(event.toString());
+        String replyToken = event.getReplyToken();
+        this.replyText(replyToken, event.getPostbackContent().toString());
+    }
+
+
     private void handleTextContent(String replyToken, Event event, TextMessageContent content) {
         String text = content.getText();
+        String homeMenu = "richmenu-7f3ab049e1c434eac55b8aec74ea8689";
+        String moreMenu = "richmenu-44594e8a911e32eb56a689eba44a3bdf";
 
         log.info("Got text message from %s : %s", replyToken, text);
 
@@ -108,10 +119,42 @@ public class LineBotController {
                                 }
                                 this.reply(replyToken, Arrays.asList(
                                         new TextMessage("Display name: " + profile.getDisplayName()),
-                                        new TextMessage("Status message: " + profile.getStatusMessage()),
-                                        new TextMessage("User ID: " + profile.getUserId())
+                                        new TextMessage("Status message: " + profile.getStatusMessage())
+                                        //new TextMessage("User ID: " + profile.getUserId())
                                 ));
                             });
+                }
+                break;
+            }
+            case "Richmenu": {
+                String userId = event.getSource().getUserId();
+                if(userId != null) {
+                    lineMessagingClient.linkRichMenuIdToUser(userId, homeMenu);
+                    return;
+                }
+                break;
+            }
+            case "richmenu unlink": {
+                String userId = event.getSource().getUserId();
+                if(userId != null) {
+                    lineMessagingClient.unlinkRichMenuIdFromUser(userId);
+                    return;
+                }
+                break;
+            }
+            case "richmenu more": {
+                String userId = event.getSource().getUserId();
+                if(userId != null) {
+                    lineMessagingClient.linkRichMenuIdToUser(userId, moreMenu);
+                    return;
+                }
+                break;
+            }
+            case "richmenu back": {
+                String userId = event.getSource().getUserId();
+                if(userId != null) {
+                    lineMessagingClient.linkRichMenuIdToUser(userId, homeMenu);
+                    return;
                 }
                 break;
             }

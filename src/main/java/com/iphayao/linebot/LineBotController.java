@@ -1,7 +1,6 @@
 package com.iphayao.linebot;
 
 import com.google.common.io.ByteStreams;
-import com.iphayao.linebot.flex.BubbleFlexMessageSupplier;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.client.MessageContentResponse;
 import com.linecorp.bot.model.ReplyMessage;
@@ -157,10 +156,6 @@ public class LineBotController {
                     lineMessagingClient.linkRichMenuIdToUser(userId, homeMenu);
                     return;
                 }
-                break;
-            }
-            case "flex": {
-                this.reply(replyToken, new BubbleFlexMessageSupplier().get());
                 break;
             }
             default:
